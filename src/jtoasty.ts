@@ -60,18 +60,22 @@ export class JToasty extends EventTarget {
         return this.lines.slice();
     }
 
-    set_meta_data<T>(key:string, value:T) {
+    has_metadata(key:string):boolean {
+        return this.meta_data.has(key);
+    }
+
+    set_metadata<T>(key:string, value:T) {
         const old_value:T = this.meta_data.get(key);
         this.meta_data.set(key, value);
         const ev = new JToastyMetadataSetEvent<T>(key, value, old_value)
         this.dispatchEvent(ev);
     }
 
-    get_meta_data<T = any>(key:string):T {
+    get_metadata<T = any>(key:string):T {
         return this.meta_data.get(key) as T;
     }
 
-    on(eventName:'JToasty.metadata-set', callback:JToastyMetadataSetEventListener):void;
+    on(eventName:'metadata-set', callback:JToastyMetadataSetEventListener, options?:AddEventListenerOptions|boolean):void;
     on(eventName:string, callback:EventListenerOrEventListenerObject, options?:AddEventListenerOptions|boolean):void {
         this.addEventListener(eventName, callback, options);
     }
@@ -80,9 +84,85 @@ export class JToasty extends EventTarget {
     }
 }
 
+export class JToastyProgess extends JToasty {
+
+    constructor(parent:HTMLElement, data:{progress:number, finishat:number, apercent?:boolean, prefixing?:string}) {
+        const { progress, finishat, apercent, prefixing } = data;
+        const completed = progress >= finishat ? 'Completed - ' : 'Processing - ';
+        const message = completed + (apercent? `${(progress/finishat * 100).toFixed(2)}%` : `Processing: ${progress} / ${finishat}`);
+        const lines = typeof prefixing == 'string' ? [prefixing, message] : [message];
+        super(parent, ...lines);
+        this.on('metadata-set', JToastyProgess.PROGRESS_METADATA_LISTENER);
+    }
+
+
+    set_progress(progress:number) {
+        this.set_metadata(JToastyProgess.PROGRESS_METADATA_PREFIX + 'progress', progress);
+    }
+
+
+    get_progress():number {
+        return this.get_metadata(JToastyProgess.PROGRESS_METADATA_PREFIX + 'progress');
+    }
+
+    finish_at(value:number):void;
+    finish_at():number;
+    finish_at(value?:unknown):any {
+        const key = JToastyProgess.PROGRESS_METADATA_PREFIX + 'finish_at';
+        if (typeof value != 'number') {
+            return this.get_metadata(key);
+        }
+        this.set_metadata(key, value);
+    }
+
+    on(event:'metadata-set', callback:JToastyMetadataSetEventListener, options?:AddEventListenerOptions|boolean):void;
+    on(event:'progress-updated'|'finishat-updated', callback:ValueUpdatedEventListner<number>, options?:AddEventListenerOptions|boolean):void;
+    on(eventName:string, callback:EventListenerOrEventListenerObject, options?:AddEventListenerOptions|boolean):void {
+        this.addEventListener(eventName, callback, options);
+    }
+
+
+    static get PROGRESS_METADATA_PREFIX() {
+        return 'PROGRESS.';
+    }
+
+    static get PROGRESS_METADATA_LISTENER() {
+        const PROGRESS_METADATA_PREFIX = JToastyProgess.PROGRESS_METADATA_PREFIX;
+        return (ev:JToastyMetadataSetEvent<number>) => {
+            const data = ev.detail;
+            if (!data.key.startsWith(PROGRESS_METADATA_PREFIX)) {
+                return;
+            }
+            const toasty:JToasty = ev.target as JToasty;
+            const texts = toasty.texts;
+            let index = 0;
+            if (texts.length == 0) {
+                texts.length = 1;
+            } else {
+                index = 1;
+            }
+            let progress:number = toasty.get_metadata(PROGRESS_METADATA_PREFIX + 'progress');
+            let finishat:number = toasty.get_metadata(PROGRESS_METADATA_PREFIX + 'finish_at');
+            let percents:boolean = toasty.get_metadata(PROGRESS_METADATA_PREFIX + 'as_percent');
+            const prefixx = progress >= finishat ? 'Completed - ' : 'Processing - ';
+            const message = prefixx + (percents? `${(progress/finishat * 100).toFixed(2)}%` : `Processing: ${progress} / ${finishat}`);
+            texts[index] = `${prefixx}${message}`;
+            toasty.texts = texts;
+            if (data.key.substring(PROGRESS_METADATA_PREFIX.length) == 'progress') {
+                const progress_event = new ValueUpdatedEvent('progress', data.old_value, progress);
+                toasty.dispatchEvent(progress_event);
+            }
+            if (progress >= finishat) {
+                const finished_event = new CustomEvent('completed');
+                toasty.dispatchEvent(finished_event);
+            }
+        }
+    }
+}
+
 export class JToastyEvent<T> extends CustomEvent<T> {
     constructor(name:string, detail:T = null) {
-        super('JToasty.' + name, { detail })
+        super(name, { detail })
     }
 }
 
@@ -91,4 +171,13 @@ export class JToastyMetadataSetEvent<T> extends JToastyEvent<{ key:string, value
         super('metadata-set', { key, value, old_value })
     }
 }
+
+export class ValueUpdatedEvent<T> extends JToastyEvent<{ old_value:T, new_value:T, property:string }> {
+    constructor(property_name:string, old_value:T, new_value:T) {
+        super(property_name + '-updated', { old_value, new_value, property: property_name });
+    }
+}
+
 export type JToastyMetadataSetEventListener = (event:JToastyMetadataSetEvent<unknown>) => any;
+
+export type ValueUpdatedEventListner<T = unknown> = (event:ValueUpdatedEvent<T>) => any;
