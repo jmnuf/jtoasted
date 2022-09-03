@@ -10,8 +10,8 @@ export class JToasty extends EventTarget {
 
     constructor(parent:HTMLElement, ...lines:string[]) {
         super();
-        this._create_base_html(parent)
-        this.texts = lines;
+        this._create_base_html(parent);
+        this.set_texts(lines);
         parent.appendChild(this.base_div);
     }
 
@@ -58,7 +58,7 @@ export class JToasty extends EventTarget {
         this.text_div.appendChild(element);
     }
 
-    set texts(value:string[]) {
+    set_texts(value:string[]) {
         if (this.lines) {
             let kids = this.text_div.children;
             let minI = Math.min(value.length, kids.length);
@@ -85,7 +85,28 @@ export class JToasty extends EventTarget {
         this.lines = value.slice();
     }
 
-    get texts() {
+    /**
+     * Set the text of a line in the notification
+     * 
+     * @param index index of text line
+     * @param value text to set at position
+     * @returns whether the index was a valid index and the line was added
+     */
+    set_text_at(index:number, value:string):boolean {
+        if (index < 0 || index > this.lines.length) {
+            return false;
+        }
+        if (index == this.lines.length) {
+            this._create_data_line_p(value);
+            return true;
+        }
+        const kids = this.text_div.children;
+        this.lines[index] = value;
+        kids[index].textContent = value;
+        return true;
+    }
+
+    get_texts() {
         return this.lines.slice();
     }
 
@@ -163,7 +184,7 @@ export class JToastyProgess extends JToasty {
                 return;
             }
             const toasty:JToasty = ev.target as JToasty;
-            const texts = toasty.texts;
+            const texts = toasty.get_texts();
             let index = 0;
             if (texts.length == 0) {
                 texts.length = 1;
@@ -176,7 +197,7 @@ export class JToastyProgess extends JToasty {
             const prefixx = progress >= finishat ? 'Completed - ' : 'Processing - ';
             const message = prefixx + (percents? `${(progress/finishat * 100).toFixed(2)}%` : `Processing: ${progress} / ${finishat}`);
             texts[index] = `${prefixx}${message}`;
-            toasty.texts = texts;
+            toasty.set_texts(texts);
             if (data.key.substring(PROGRESS_METADATA_PREFIX.length) == 'progress') {
                 const progress_event = new ValueUpdatedEvent('progress', data.old_value, progress);
                 toasty.dispatchEvent(progress_event);

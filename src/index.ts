@@ -37,7 +37,7 @@ export class JToastyToaster extends EventTarget {
     public notification(element:JToasty, ...lines:string[]):JToasty;
     public notification(element:unknown, ...lines:string[]):JToasty {
         if (element instanceof JToasty) {
-            element.texts = lines;
+            element.set_texts(lines);
             return element;
         }
         if (typeof element == 'string') {
@@ -59,13 +59,13 @@ export class JToastyToaster extends EventTarget {
             // Progress exists on this toasty so we just update the values
             if (a.has_metadata(PROGRESS_METADATA_PREFIX + 'progress')) {
                 if (typeof c == 'string') {
-                    const texts = a.texts;
+                    const texts = a.get_texts();
                     if (texts.length == 1) {
                         texts.unshift(c);
                     } else {
                         texts[0] = c;
                     }
-                    a.texts = texts;
+                    a.set_texts(texts);
                 }
 
                 a.set_metadata(PROGRESS_METADATA_PREFIX + 'progress', data.progress);
