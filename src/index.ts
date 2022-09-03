@@ -47,9 +47,9 @@ export class JToastyToaster extends EventTarget {
         return this.createNotification(...lines);
     }
 
-    public progressNotification(data:ProgressToastyInformation):JToasty;
+    public progressNotification(data:ProgressToastyInformation):JToastyProgess;
     public progressNotification(toasty:JToasty, data:ProgressToastyInformation):JToasty;
-    public progressNotification(data:ProgressToastyInformation, prefixing_line:string):JToasty;
+    public progressNotification(data:ProgressToastyInformation, prefixing_line:string):JToastyProgess;
     public progressNotification(toasty:JToasty, data:ProgressToastyInformation, prefixing_line:string):JToasty;
     public progressNotification(a:unknown, b?:unknown, c?:unknown):JToasty {
         const PROGRESS_METADATA_PREFIX = JToastyProgess.PROGRESS_METADATA_PREFIX;
@@ -85,7 +85,8 @@ export class JToastyToaster extends EventTarget {
             
             return a;
         }
-        const data = Object.assign({ finishat: 100, progress: 0, apercent:false, prefixing:c as string }, a);
+        const data = Object.assign({ finishat: 100, progress: 0, apercent:false, prefixing:b as string }, a);
+        console.log(data)
         const toasty = new JToastyProgess(this.toasted_div, data);
         
         return toasty;
