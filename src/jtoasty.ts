@@ -6,10 +6,11 @@ export class JToasty extends EventTarget {
 
     protected lines:string[];
 
-    private meta_data:Map<string, any>
+    protected meta_data:Map<string, any>
 
     constructor(parent:HTMLElement, ...lines:string[]) {
         super();
+        this.meta_data = new Map();
         this._create_base_html(parent);
         this.set_texts(lines);
         parent.appendChild(this.base_div);
@@ -126,6 +127,7 @@ export class JToasty extends EventTarget {
     }
 
     on(eventName:'metadata-set', callback:JToastyMetadataSetEventListener, options?:AddEventListenerOptions|boolean):void;
+    on(eventName:string, callback:EventListenerOrEventListenerObject, options?:AddEventListenerOptions|boolean):void;
     on(eventName:string, callback:EventListenerOrEventListenerObject, options?:AddEventListenerOptions|boolean):void {
         this.addEventListener(eventName, callback, options);
     }
@@ -138,11 +140,15 @@ export class JToastyProgess extends JToasty {
 
     constructor(parent:HTMLElement, data:{progress:number, finishat:number, apercent?:boolean, prefixing?:string}) {
         const { progress, finishat, apercent, prefixing } = data;
-        const completed = progress >= finishat ? 'Completed - ' : 'Processing - ';
-        const message = completed + (apercent? `${(progress/finishat * 100).toFixed(2)}%` : `Processing: ${progress} / ${finishat}`);
-        const lines = typeof prefixing == 'string' ? [prefixing, message] : [message];
-        super(parent, ...lines);
+        if (typeof prefixing == 'string') {
+            super(parent, prefixing, '');
+        } else {
+            super(parent);
+        }
         this.on('metadata-set', JToastyProgess.PROGRESS_METADATA_LISTENER);
+        this.meta_data.set(JToastyProgess.PROGRESS_METADATA_PREFIX + 'progress' , progress);
+        this.meta_data.set(JToastyProgess.PROGRESS_METADATA_PREFIX + 'finish_at', finishat);
+        this.set_metadata(JToastyProgess.PROGRESS_METADATA_PREFIX + 'as_percent', apercent);
     }
 
 
@@ -167,6 +173,7 @@ export class JToastyProgess extends JToasty {
 
     on(event:'metadata-set', callback:JToastyMetadataSetEventListener, options?:AddEventListenerOptions|boolean):void;
     on(event:'progress-updated'|'finishat-updated', callback:ValueUpdatedEventListner<number>, options?:AddEventListenerOptions|boolean):void;
+    on(eventName:string, callback:EventListenerOrEventListenerObject, options?:AddEventListenerOptions|boolean):void;
     on(eventName:string, callback:EventListenerOrEventListenerObject, options?:AddEventListenerOptions|boolean):void {
         this.addEventListener(eventName, callback, options);
     }
@@ -185,17 +192,15 @@ export class JToastyProgess extends JToasty {
             }
             const toasty:JToasty = ev.target as JToasty;
             const texts = toasty.get_texts();
-            let index = 0;
+            let index = texts.length - 1;
             if (texts.length == 0) {
                 texts.length = 1;
-            } else {
-                index = 1;
             }
             let progress:number = toasty.get_metadata(PROGRESS_METADATA_PREFIX + 'progress');
             let finishat:number = toasty.get_metadata(PROGRESS_METADATA_PREFIX + 'finish_at');
             let percents:boolean = toasty.get_metadata(PROGRESS_METADATA_PREFIX + 'as_percent');
             const prefixx = progress >= finishat ? 'Completed - ' : 'Processing - ';
-            const message = prefixx + (percents? `${(progress/finishat * 100).toFixed(2)}%` : `Processing: ${progress} / ${finishat}`);
+            const message = prefixx + (percents? `${(progress/finishat * 100).toFixed(2)}%` : `${progress} / ${finishat}`);
             texts[index] = `${prefixx}${message}`;
             toasty.set_texts(texts);
             if (data.key.substring(PROGRESS_METADATA_PREFIX.length) == 'progress') {
