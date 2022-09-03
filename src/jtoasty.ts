@@ -200,9 +200,8 @@ export class JToastyProgess extends JToasty {
             let finishat:number = toasty.get_metadata(PROGRESS_METADATA_PREFIX + 'finish_at');
             let percents:boolean = toasty.get_metadata(PROGRESS_METADATA_PREFIX + 'as_percent');
             const prefixx = progress >= finishat ? 'Completed - ' : 'Processing - ';
-            const message = prefixx + (percents? `${(progress/finishat * 100).toFixed(2)}%` : `${progress} / ${finishat}`);
-            texts[index] = `${prefixx}${message}`;
-            toasty.set_texts(texts);
+            const message = percents? `${(progress/finishat * 100).toFixed(2)}%` : `${progress} / ${finishat}`;
+            toasty.set_text_at(index, `${prefixx}${message}`);
             if (data.key.substring(PROGRESS_METADATA_PREFIX.length) == 'progress') {
                 const progress_event = new ValueUpdatedEvent('progress', data.old_value, progress);
                 toasty.dispatchEvent(progress_event);
