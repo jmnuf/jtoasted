@@ -25,13 +25,14 @@
 .jtoasted .jtoasted-exit-btn {
     position: absolute;
     text-align: center;
-    top: calc(0 - var(--half-jtoasted-exit-btn-size));
-    right: calc(0 - var(--half-jtoasted-exit-btn-size));
+    top: calc(var(--half-jtoasted-exit-btn-size) * -0.5);
+    right: calc(var(--half-jtoasted-exit-btn-size) * -0.5);
     width: var(--jtoasted-exit-btn-size);
     height: var(--jtoasted-exit-btn-size);
     background-color: rgba(175, 255, 243, 0.1);
-    border: black 1px solid;
-    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    color: red;
 }
 .jtoasted .jtoasted-data * {
     margin: 0%;

@@ -2,6 +2,7 @@
 export class JToasty extends EventTarget {
     protected base_div:HTMLDivElement;
     protected text_div:HTMLDivElement;
+    protected exit_btn:HTMLButtonElement;
 
     protected lines:string[];
 
@@ -16,6 +17,7 @@ export class JToasty extends EventTarget {
 
     private _create_base_html(parent:HTMLElement) {
         this._create_base_div(parent);
+        this._create_exit_button();
         this._create_text_div();
     }
 
@@ -31,6 +33,22 @@ export class JToasty extends EventTarget {
         div.classList.add('jtoasted-data');
         this.base_div.appendChild(div);
         this.text_div = div;
+    }
+
+    private _create_exit_button() {
+        const btn = document.createElement('button');
+        btn.classList.add('jtoasted-exit-btn');
+        const div = this.base_div;
+        btn.addEventListener('click', () => {
+            const to_remove_event = new CustomEvent('user-remove', { cancelable: true, detail: { toasty:this } })
+            if (!this.dispatchEvent(to_remove_event)) {
+                return;
+            }
+            div.remove();
+        });
+        btn.innerHTML = '&cross;';
+        div.appendChild(btn);
+        this.exit_btn = btn;
     }
 
     private _create_data_line_p(text:string) {
