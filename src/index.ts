@@ -86,7 +86,6 @@ export class JToastyToaster extends EventTarget {
             return a;
         }
         const data = Object.assign({ finishat: 100, progress: 0, apercent:false, prefixing:b as string }, a);
-        console.log(data)
         const toasty = new JToastyProgess(this.toasted_div, data);
         
         return toasty;
