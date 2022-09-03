@@ -1,3 +1,4 @@
+import { run_demo } from './demo';
 import { JToasty, JToastyProgess } from './jtoasty';
 import './style.css';
 
@@ -20,6 +21,7 @@ export class JToastyToaster extends EventTarget {
         }
         this.parent = parent;
         this.toasted_div = document.createElement('div');
+        this.toasted_div.classList.add('jtoasteds-container');
         this.parent.appendChild(this.toasted_div);
     }
 
@@ -89,3 +91,6 @@ export class JToastyToaster extends EventTarget {
         return toasty;
     }
 }
+
+// Demo code
+run_demo();

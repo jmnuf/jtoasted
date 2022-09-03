@@ -1,8 +1,10 @@
 /*style.css*/ 
 .jtoasteds-container {
+    --jtoasted-exit-btn-size: 25px;
+    --half-jtoasted-exit-btn-size: calc(var(--jtoasted-exit-btn-size) / 2);
     position: fixed;
-    bottom: 0%;
-    right: 0%;
+    right: var(--half-jtoasted-exit-btn-size);
+    bottom: 10px;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -16,7 +18,6 @@
     padding: 5px;
     min-width: 2em;
     min-height: 1.5em;
-    --jtoasted-exit-btn-size: 25px;
 
     user-select: none;
     -webkit-user-select: none;
@@ -24,14 +25,14 @@
 .jtoasted .jtoasted-exit-btn {
     position: absolute;
     text-align: center;
-    top: calc(0 - var(--jtoasted-exit-btn-size) / 2);
-    right: calc(0 - var(--jtoasted-exit-btn-size) / 2);
+    top: calc(0 - var(--half-jtoasted-exit-btn-size));
+    right: calc(0 - var(--half-jtoasted-exit-btn-size));
     width: var(--jtoasted-exit-btn-size);
     height: var(--jtoasted-exit-btn-size);
     background-color: rgba(175, 255, 243, 0.1);
     border: black 1px solid;
     border-radius: 50%;
 }
-.jtoasted .jtoasted-data {
+.jtoasted .jtoasted-data * {
     margin: 0%;
 }

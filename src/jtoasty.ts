@@ -9,17 +9,28 @@ export class JToasty extends EventTarget {
 
     constructor(parent:HTMLElement, ...lines:string[]) {
         super();
-        this._create_base_div();
-        this.text_div = document.createElement('div');
-        this.text_div
+        this._create_base_html(parent)
         this.texts = lines;
         parent.appendChild(this.base_div);
     }
 
-    private _create_base_div() {
+    private _create_base_html(parent:HTMLElement) {
+        this._create_base_div(parent);
+        this._create_text_div();
+    }
+
+    private _create_base_div(parent:HTMLElement) {
         const div = document.createElement('div');
         div.classList.add('jtoasted');
         this.base_div = div;
+        parent.appendChild(div);
+    }
+
+    private _create_text_div() {
+        const div = document.createElement('div');
+        div.classList.add('jtoasted-data');
+        this.base_div.appendChild(div);
+        this.text_div = div;
     }
 
     private _create_data_line_p(text:string) {
