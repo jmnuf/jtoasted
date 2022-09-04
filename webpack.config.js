@@ -4,7 +4,9 @@ const path = require('path');
 const mode = process.env.NODE_ENV == 'production' ? 'production' : 'development';
 
 module.exports = {
-	entry: './src/index.ts',
+	entry: {
+		index: path.resolve(__dirname, 'src/index.ts'),
+	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),
 		filename: '[name].js',
@@ -12,6 +14,7 @@ module.exports = {
 			name: 'JToasted',
 			type: 'umd',
 		},
+		clean: true,
 	},
 	mode: mode,
 	module: {
@@ -28,7 +31,7 @@ module.exports = {
 				test: /\.tsx?$/,
 				use: 'ts-loader',
 				exclude: /node_modules/,
-			},
+			}
 		],
 	},
 	devtool: 'inline-source-map',

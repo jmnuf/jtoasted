@@ -16,7 +16,7 @@
    },
    "exclude": [
     "node_modules",
-    "build",
+    "example",
     "dist",
     "webpack_example.config.js",
     "webpack.config.js"
