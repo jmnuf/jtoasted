@@ -1,12 +1,24 @@
 {  
  "compilerOptions": { 
-   "outDir": "./build/",
+  //  "outDir": "./build/",
+   "outDir": "./dist/",
+   "declaration": true,
    "sourceMap": true, 
    "noImplicitAny": true,
-   "module": "ESNext",
+   "module": "CommonJS",
    "target": "ES6",
+   "lib": ["es2017", "es7", "es6", "dom"],
    "jsx": "react",
    "allowJs": true,
-   "moduleResolution": "node"
-   }
+   "moduleResolution": "node",
+   "noUnusedLocals": true,
+   "esModuleInterop": true,
+   },
+   "exclude": [
+    "node_modules",
+    "build",
+    "dist",
+    "webpack_example.config.js",
+    "webpack.config.js"
+   ]
  }
