@@ -18,8 +18,9 @@
 				`Self-destructing in ${finishat} seconds`,
 			]);
 			toasty.set_lifetime(finishat);
+			let timer = 0;
 			intervalId = setInterval(
-				(startTime) => {
+				() => {
 					if (!toasty.alive) {
 						if (intervalId != null) {
 							clearInterval(intervalId);
@@ -27,12 +28,11 @@
 						}
 						return;
 					}
-					const time_past = Math.floor((Date.now() - startTime) / 1000);
+					timer++;
 					const last_text_id = toasty.get_texts().length - 1;
-					toasty.set_text_at(last_text_id, `Message self-destructing in ${finishat - time_past} seconds`);
+					toasty.set_text_at(last_text_id, `Message self-destructing in ${finishat - timer} seconds`);
 				},
-				1000,
-				Date.now(),
+				1000
 			);
 		}, changeat * 1000);
 	})();
@@ -57,4 +57,38 @@
 		}, 1000);
 	})();
 
+	(function DEMO3() {
+		/**
+		 * @type {HTMLTextAreaElement}
+		 */
+		const areainput = document.getElementById('messagearea');
+		/**
+		 * @type {HTMLInputElement}
+		 */
+		const lifeinput = document.getElementById('lifetimeinput');
+		const submitbtn = document.getElementById('notif-btn');
+
+		submitbtn.addEventListener('click', () => {
+			const text = areainput.value;
+			if (!text.length) {
+				return;
+			}
+			let life = Number(lifeinput.value);
+			const lines = text.split('\n');
+			for (let i = lines.length - 1; i >= 0; i--) {
+				const line = lines[i].trim();
+				if (!line.length) {
+					lines.splice(i, 1);
+				}
+			}
+			if (lines.length == 0) {
+				return;
+			}
+			if (life == 0) {
+				life = undefined;
+			}
+
+			toaster.createNotification(life, ...lines);
+		});
+	})();
 })();

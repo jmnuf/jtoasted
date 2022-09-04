@@ -1,0 +1,15 @@
+
+.center-container {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	width: 80%;
+	margin-inline: auto;
+	gap: 1em;
+}
+
+.center-container label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15em;
+}
