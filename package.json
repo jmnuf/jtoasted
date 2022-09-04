@@ -2,19 +2,24 @@
 	"name": "jtoasted",
 	"version": "0.5.0",
 	"description": "A small little thing for simple html toasts",
-	"main": "./src/index.ts",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "echo \"No tests available for now!\"",
 		"format": "prettier --write \"./src/**/*.ts\" --config .prettierrc",
 		"lint": "eslint src/* --fix",
 		"build": "webpack",
-		"start": "webpack serve --open"
+		"watch": "webpack --watch"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/jmnuf/jtoasted.git"
 	},
-	"keywords": [],
+	"keywords": [
+		"html",
+		"typescript",
+		"toast"
+	],
 	"author": "JM<jose.m.nufio.0@gmail.com>",
 	"license": "MIT",
 	"bugs": {
