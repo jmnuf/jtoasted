@@ -1,5 +1,5 @@
 import { run_demo } from './demo';
-import { JToasty, JToastyProgess } from './jtoasty';
+import { JToasty, JToastyProgess, ToastyProgessSettings } from './jtoasty';
 import './style.css';
 
 
@@ -25,8 +25,16 @@ export class JToastyToaster extends EventTarget {
         this.parent.appendChild(this.toasted_div);
     }
 
-    public createNotification(...lines:string[]):JToasty {
-        const toasty = new JToasty(this.toasted_div, ...lines);
+    public createNotification(...lines:string[]):JToasty;
+    public createNotification(lifetime:number, ...lines:string[]):JToasty;
+    public createNotification(a:unknown, ...lines:string[]):JToasty {
+        let lifetime:number = 5;
+        if (typeof a == 'string') {
+            lines.unshift(a);
+        } else if (Number.isSafeInteger(a)) {
+            lifetime = a as number;
+        }
+        const toasty = new JToasty(this.toasted_div, lifetime, ...lines);
         toasty.on('metadata-set', (ev) => {
             this.dispatchEvent(new CustomEvent('jtoasty.metadata-set', { detail: { data: ev.detail, toasty } }));
         })
@@ -34,59 +42,67 @@ export class JToastyToaster extends EventTarget {
     }
 
     public notification(...lines:string[]):JToasty;
+    public notification(lifetime:number, ...lines:string[]):JToasty;
     public notification(element:JToasty, ...lines:string[]):JToasty;
-    public notification(element:unknown, ...lines:string[]):JToasty {
-        if (element instanceof JToasty) {
-            element.set_texts(lines);
-            return element;
+    public notification(element:JToasty, lifetime:number, ...lines:string[]):JToasty;
+    public notification(a:unknown, b:unknown, ...lines:string[]):JToasty {
+        if (a instanceof JToasty) {
+            if (typeof b == 'number') {
+                a.set_texts(lines);
+                a.set_lifetime(b);
+            } else if (typeof b == 'string') {
+                lines.unshift(b);
+            }
+            a.set_texts(lines);
+            return a;
         }
-        if (typeof element == 'string') {
-            const all_lines:string[] = [element].concat(lines);
-            return this.createNotification(...all_lines);
+        if (typeof a == 'number') {
+            if (typeof b == 'string') {
+                lines.unshift(b);
+            }
+            return this.createNotification(a, ...lines);
+        }
+        if (typeof a == 'string') {
+            lines.unshift(a);
+        }
+        if (typeof b == 'string') {
+            lines.unshift(b);
         }
         return this.createNotification(...lines);
     }
 
     public progressNotification(data:ProgressToastyInformation):JToastyProgess;
-    public progressNotification(toasty:JToasty, data:ProgressToastyInformation):JToasty;
+    public progressNotification(toasty:JToastyProgess, data:ProgressToastyInformation):JToastyProgess;
     public progressNotification(data:ProgressToastyInformation, prefixing_line:string):JToastyProgess;
-    public progressNotification(toasty:JToasty, data:ProgressToastyInformation, prefixing_line:string):JToasty;
-    public progressNotification(a:unknown, b?:unknown, c?:unknown):JToasty {
-        const PROGRESS_METADATA_PREFIX = JToastyProgess.PROGRESS_METADATA_PREFIX;
-        
-        if (a instanceof JToasty) {
+    public progressNotification(toasty:JToastyProgess, data:ProgressToastyInformation, prefixing_line:string):JToastyProgess;
+    public progressNotification(a:unknown, b?:unknown, c?:unknown):JToastyProgess {
+        if (a instanceof JToastyProgess) {
             const data = b as ProgressToastyInformation;
             // Progress exists on this toasty so we just update the values
-            if (a.has_metadata(PROGRESS_METADATA_PREFIX + 'progress')) {
-                if (typeof c == 'string') {
-                    const texts = a.get_texts();
-                    if (texts.length == 1) {
-                        texts.unshift(c);
-                    } else {
-                        texts[0] = c;
-                    }
-                    a.set_texts(texts);
+            if (typeof c == 'string') {
+                const texts = a.get_texts();
+                if (texts.length == 1) {
+                    texts.unshift(c);
+                } else {
+                    texts[0] = c;
                 }
-
-                a.set_metadata(PROGRESS_METADATA_PREFIX + 'progress', data.progress);
-                if (typeof data.finishat == 'number') {
-                    a.set_metadata(PROGRESS_METADATA_PREFIX + 'finish_at', data.finishat);
-                }
-                if (typeof data.apercent == 'boolean') {
-                    a.set_metadata(PROGRESS_METADATA_PREFIX + 'as_percent', data.apercent);
-                }
-                return a;
+                a.set_texts(texts);
             }
 
-            a.set_metadata(PROGRESS_METADATA_PREFIX + 'progress', data.progress);
-            a.set_metadata(PROGRESS_METADATA_PREFIX + 'finish_at', data.finishat);
-            a.set_metadata(PROGRESS_METADATA_PREFIX + 'as_percent', Boolean(data.apercent));
-            a.on('metadata-set', JToastyProgess.PROGRESS_METADATA_LISTENER);
+            if (typeof data.progress == 'number') {
+                a.set_progress(data.progress);
+            }
+            if (typeof data.finishat == 'number') {
+                a.finish_at(data.finishat);
+            }
+            if (typeof data.apercent == 'boolean') {
+                a.use_percentage(data.apercent);
+            }
             
             return a;
         }
-        const data = Object.assign({ finishat: 100, progress: 0, apercent:false, prefixing:b as string }, a);
-        const toasty = new JToastyProgess(this.toasted_div, data);
+        const data = Object.assign({ finishat: 100, lifetime: 5, progress: 0, apercent:false, prefixing:b as string }, a);
+        const toasty = new JToastyProgess(this.toasted_div, data as ToastyProgessSettings);
         
         return toasty;
     }
