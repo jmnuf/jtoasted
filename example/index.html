@@ -12,11 +12,14 @@
 <body>
 	<div class="center-container">
 		<label for="messagearea">Notification message
-			<textarea name="messsage" id="messagearea" cols="30" rows="10"></textarea>
+			<textarea name="messsage" id="messagearea" cols="30" rows="10">Sample text</textarea>
 		</label>
 		<label for="lifetimeinput">Duration in seconds (Leave at 0 for default(5) or -1 to make it wait till manually
 			closed)
 			<input type="number" value="5" name="lifetime" id="lifetimeinput" min="-1">
+		</label>
+		<label for="siding">Notifications siding
+			<select name="siding" id="siding" disabled="disabled"></select>
 		</label>
 		<button id="notif-btn">Create notification</button>
 	</div>

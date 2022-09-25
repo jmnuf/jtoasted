@@ -1,6 +1,9 @@
 
 (function DEMOS() {
-	const toaster = new window.JToasted.JToastyToaster(document.body);
+	const JToasted = window.JToasted;
+	console.log(JToasted);
+	const toaster = new JToasted.JToastyToaster(document.body);
+	const sleep = (ms=500) => new Promise(res => setTimeout(res, ms));
 
 	// First Demo
 	// Toasty has a message that gets changed some time later to then self-destruct in 5s
@@ -57,6 +60,8 @@
 		}, 1000);
 	})();
 
+	// Third demo
+	// User can create a custom toasty to show their own custom message
 	(function DEMO3() {
 		/**
 		 * @type {HTMLTextAreaElement}
@@ -89,6 +94,42 @@
 			}
 
 			toaster.createNotification(life, ...lines);
+		});
+	})();
+
+	// Fourth demo
+	// Move toaster around the screen
+	(async function DEMO4() {
+		const sidingInput = document.querySelector('#siding');
+		const timeout = 2100;
+		const POS = JToasted.TOASTY_POSITION;
+		for (let i = 0; i < 4; i++) {
+			const option = document.createElement('option');
+			option.text = POS[i];
+			option.value = i;
+			sidingInput.appendChild(option);
+		}
+		await sleep(timeout);
+
+		sidingInput.value = POS.BOTTOM_LEFT;
+		toaster.sideTo(POS.BOTTOM_LEFT);
+		await sleep(timeout);
+
+		sidingInput.value = POS.TOP_LEFT;
+		toaster.sideTo(POS.TOP_LEFT);
+		await sleep(timeout);
+
+		sidingInput.value = POS.TOP_RIGHT;
+		toaster.sideTo(POS.TOP_RIGHT);
+		await sleep(timeout);
+
+		sidingInput.value = POS.BOTTOM_RIGHT;
+		toaster.sideTo(POS.BOTTOM_RIGHT);
+
+		sidingInput.disabled = false;
+		sidingInput.addEventListener('change', () => {
+			const pos = Number(sidingInput.value);
+			toaster.sideTo(pos);
 		});
 	})();
 })();
