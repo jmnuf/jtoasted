@@ -1,43 +1,61 @@
-/*style.css*/ 
+/*style.css*/
 .jtoasteds-container {
-    --jtoasted-exit-btn-size: 25px;
-    --half-jtoasted-exit-btn-size: calc(var(--jtoasted-exit-btn-size) / 2);
-    position: fixed;
-    right: var(--half-jtoasted-exit-btn-size);
-    bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+	--jtoasted-exit-btn-size: 25px;
+	--half-jtoasted-exit-btn-size: calc(var(--jtoasted-exit-btn-size) / 2);
+	position: fixed;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.jtoasteds-container.bottom-right {
+	right: var(--half-jtoasted-exit-btn-size);
+	bottom: 10px;
+}
+.jtoasteds-container.bottom-left {
+	left: var(--half-jtoasted-exit-btn-size);
+	bottom: 10px;
+}
+.jtoasteds-container.top-right {
+	right: var(--half-jtoasted-exit-btn-size);
+	top: 10px;
+}
+.jtoasteds-container.top-left {
+	left: var(--half-jtoasted-exit-btn-size);
+	top: 10px;
+}
+.jtoasteds-container.reversed {
+	flex-direction: column-reverse;
 }
 
 .jtoasted {
-    position: relative;
-    background-color: azure;
-    border: 1px slategray solid;
-    border-radius: 5px;
-    padding: 5px;
-    min-width: 100px;
-    min-height: 1.5em;
-    max-width: 25vw;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: 0%;
-    
-    user-select: none;
-    -webkit-user-select: none;
+	position: relative;
+	background-color: azure;
+	border: 1px slategray solid;
+	border-radius: 5px;
+	padding: 5px;
+	min-width: 100px;
+	min-height: 1.5em;
+	max-width: 25vw;
+	width: fit-content;
+	margin-left: auto;
+	margin-right: 0%;
+
+	user-select: none;
+	-webkit-user-select: none;
 }
 .jtoasted .jtoasted-exit-btn {
-    position: absolute;
-    text-align: center;
-    top: calc(var(--half-jtoasted-exit-btn-size) * -0.5);
-    right: calc(var(--half-jtoasted-exit-btn-size) * -0.5);
-    width: var(--jtoasted-exit-btn-size);
-    height: var(--jtoasted-exit-btn-size);
-    background-color: rgba(175, 255, 243, 0.1);
-    border: none;
-    cursor: pointer;
-    color: red;
+	position: absolute;
+	text-align: center;
+	top: calc(var(--half-jtoasted-exit-btn-size) * -0.5);
+	right: calc(var(--half-jtoasted-exit-btn-size) * -0.5);
+	width: var(--jtoasted-exit-btn-size);
+	height: var(--jtoasted-exit-btn-size);
+	background-color: rgba(175, 255, 243, 0.1);
+	border: none;
+	cursor: pointer;
+	color: red;
 }
 .jtoasted .jtoasted-data * {
-    margin: 0%;
+	margin: 0%;
 }

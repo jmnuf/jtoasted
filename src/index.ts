@@ -7,12 +7,41 @@ type ProgressToastyInformation = {
 	apercent?: boolean;
 };
 
+export enum TOASTY_POSITION {
+	BOTTOM_RIGHT,
+	BOTTOM_LEFT,
+	TOP_LEFT,
+	TOP_RIGHT
+}
+
 export class JToastyToaster extends EventTarget {
 	private parent: HTMLElement;
+	protected positioning: {
+		sidesTo: TOASTY_POSITION,
+		cssClass:string,
+		changeTo: (side:TOASTY_POSITION) => void;
+	};
 	protected toasted_div: HTMLDivElement;
 
-	constructor(parent: HTMLElement = document.body) {
+	constructor();
+	constructor(parent: HTMLElement);
+	constructor(position: TOASTY_POSITION);
+	constructor(parent: HTMLElement, position: TOASTY_POSITION);
+	constructor(a?:unknown, b?:unknown) {
 		super();
+		let parent:object = document.body;
+		let position = TOASTY_POSITION.BOTTOM_RIGHT;
+		if (typeof a == 'object') {
+			parent = a;
+			if (typeof b == 'number') {
+				position = b;
+			}
+		} else if (typeof a == 'number') {
+			position = a;
+			if (typeof b == 'object') {
+				parent = b;
+			}
+		}
 		if (!(parent instanceof HTMLElement)) {
 			throw new TypeError('Passed parent must be an HTMLElement instance');
 		}
@@ -20,7 +49,61 @@ export class JToastyToaster extends EventTarget {
 		this.parent = parent;
 		this.toasted_div = document.createElement('div');
 		this.toasted_div.classList.add('jtoasteds-container');
+		const positioning = {
+			sidesTo: position,
+			changeTo: (side: TOASTY_POSITION) => {
+				this.positioning.sidesTo = side;
+				this.toasted_div.classList.remove(this.positioning.cssClass);
+				this.cssSideToClass();
+				return; 
+			},
+			cssClass: 'bottom-right',
+		};
+		switch (position) {
+		case TOASTY_POSITION.BOTTOM_LEFT:
+		case TOASTY_POSITION.TOP_LEFT:
+		case TOASTY_POSITION.TOP_RIGHT:
+			break;
+			
+		default:
+			positioning.sidesTo = TOASTY_POSITION.BOTTOM_RIGHT;
+			break;
+		}
+		this.positioning = positioning;
+		this.cssSideToClass();
 		this.parent.appendChild(this.toasted_div);
+	}
+
+	protected cssSideToClass() {
+		switch (this.positioning.sidesTo) {
+		case TOASTY_POSITION.BOTTOM_LEFT:
+			this.positioning.cssClass = 'bottom-left';
+			break;
+					
+		case TOASTY_POSITION.TOP_LEFT:
+			this.positioning.cssClass = 'top-left';
+			break;
+						
+		case TOASTY_POSITION.TOP_RIGHT:
+			this.positioning.cssClass = 'top-right';
+			break;
+					
+		case TOASTY_POSITION.BOTTOM_RIGHT:
+			this.positioning.cssClass = 'bottom-right';
+			break;
+		
+		default:
+			return;
+		}
+
+		this.toasted_div.classList.add(this.positioning.cssClass);
+	}
+
+	public sideTo(position: TOASTY_POSITION) {
+		if (position < 0 || position > 3) {
+			return;
+		}
+		this.positioning.changeTo(position);
 	}
 
 	public createNotification(...lines: string[]): JToasty;

@@ -5,10 +5,26 @@ declare type ProgressToastyInformation = {
     finishat?: number;
     apercent?: boolean;
 };
+export declare enum TOASTY_POSITION {
+    BOTTOM_RIGHT = 0,
+    BOTTOM_LEFT = 1,
+    TOP_LEFT = 2,
+    TOP_RIGHT = 3
+}
 export declare class JToastyToaster extends EventTarget {
     private parent;
+    protected positioning: {
+        sidesTo: TOASTY_POSITION;
+        cssClass: string;
+        changeTo: (side: TOASTY_POSITION) => void;
+    };
     protected toasted_div: HTMLDivElement;
-    constructor(parent?: HTMLElement);
+    constructor();
+    constructor(parent: HTMLElement);
+    constructor(position: TOASTY_POSITION);
+    constructor(parent: HTMLElement, position: TOASTY_POSITION);
+    protected cssSideToClass(): void;
+    sideTo(position: TOASTY_POSITION): void;
     createNotification(...lines: string[]): JToasty;
     createNotification(lifetime: number, ...lines: string[]): JToasty;
     notification(...lines: string[]): JToasty;
