@@ -71,6 +71,10 @@
 		 * @type {HTMLInputElement}
 		 */
 		const lifeinput = document.getElementById('lifetimeinput');
+		/**
+		 * @type {HTMLInputElement}
+		 */
+		const isProgress = document.getElementById('progressive');
 		const submitbtn = document.getElementById('notif-btn');
 
 		submitbtn.addEventListener('click', () => {
@@ -93,7 +97,22 @@
 				life = undefined;
 			}
 
-			toaster.createNotification(life, ...lines);
+			if (isProgress.checked) {
+				const progress = toaster.progressNotification({ finishat: 5, progress: 0, apercent: true }, lines[0]);
+				let intervalId = setInterval(() => {
+					let progression = progress.get_progress();
+					progression += 1;
+					if (progress.is_complete) {
+						clearInterval(intervalId);
+					}
+					if (progress.finish_at() < progression) {
+						return;
+					}
+					progress.set_progress(progression);
+				}, 1000);
+			} else {
+				toaster.notification(life, ...lines);
+			}
 		});
 	})();
 
