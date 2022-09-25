@@ -237,6 +237,8 @@ type PROGRESSION_PREFIX = 'PROGRESS.';
 
 export class JToastyProgess extends JToasty {
 	private _on_completed_callback: JToastyEventListener;
+	protected progress_div: HTMLDivElement;
+	protected progression_div: HTMLDivElement;
 
 	constructor(parent: HTMLElement, data: ToastyProgessSettings) {
 		const { progress, finishat, apercent, lifetime, prefixing } = data;
@@ -245,6 +247,7 @@ export class JToastyProgess extends JToasty {
 		} else {
 			super(parent, -1);
 		}
+		this._create_progress_bar();
 		this.on('metadata-set', JToastyProgess.PROGRESS_METADATA_LISTENER);
 		this.meta_data.set(JToastyProgess.PROGRESS_METADATA_PROGRESS_KEY, progress);
 		this.meta_data.set(JToastyProgess.PROGRESS_METADATA_FINISH_AT_KEY, finishat);
@@ -253,6 +256,20 @@ export class JToastyProgess extends JToasty {
 			this.set_lifetime(lifetime);
 		};
 		this.once('completed', this._on_completed_callback);
+		this.progression_div.style.setProperty('--progress', `${this.get_percentage()}%`);
+	}
+
+	private _create_progress_bar() {
+		const progress_div = document.createElement('div');
+		progress_div.classList.add('progress-bar');
+		const progression = document.createElement('div');
+		progression.classList.add('progression');
+
+		progress_div.appendChild(progression);
+		this.base_div.appendChild(progress_div);
+		
+		this.progress_div = progress_div;
+		this.progression_div = progression;
 	}
 
 	get is_complete() {
@@ -272,6 +289,14 @@ export class JToastyProgess extends JToasty {
 
 	get_progress(): number {
 		return this.get_metadata(JToastyProgess.PROGRESS_METADATA_PREFIX + 'progress');
+	}
+
+	get_percentage(): number {
+		const progress = this.get_progress();
+		const total: number = this.get_metadata(JToastyProgess.PROGRESS_METADATA_FINISH_AT_KEY);
+		const decimal = progress / total;
+
+		return decimal * 100;
 	}
 
 	finish_at(value: number): void;
@@ -372,6 +397,7 @@ export class JToastyProgess extends JToasty {
 			}
 			const toasty = ev.target;
 			const texts = toasty.get_texts();
+			toasty.progression_div.style.setProperty('--progress', `${toasty.get_percentage()}%`);
 			let index = texts.length - 1;
 			if (texts.length == 0) {
 				texts.length = 1;

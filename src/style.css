@@ -59,3 +59,20 @@
 .jtoasted .jtoasted-data * {
 	margin: 0%;
 }
+.jtoasted .progress-bar {
+	position: absolute;
+	bottom: 2px;
+	height: calc(var(--jtoasted-exit-btn-size) * 0.15);
+	left: 5px;
+	right: 5px;
+	background-color: darkgray;
+	overflow: hidden;
+	border-radius: 5px;
+}
+.jtoasted .progress-bar .progression {
+	--progress: 0%;
+	width: var(--progress);
+	height: 100%;
+	background-color: lime;
+	transition: width 0.5s ease-in-out;
+}

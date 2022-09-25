@@ -47,11 +47,15 @@ export declare type ToastyProgessSettings = {
 declare type PROGRESSION_PREFIX = 'PROGRESS.';
 export declare class JToastyProgess extends JToasty {
     private _on_completed_callback;
+    protected progress_div: HTMLDivElement;
+    protected progression_div: HTMLDivElement;
     constructor(parent: HTMLElement, data: ToastyProgessSettings);
+    private _create_progress_bar;
     get is_complete(): boolean;
     set_lifetime(lifetime: number): void;
     set_progress(progress: number): void;
     get_progress(): number;
+    get_percentage(): number;
     finish_at(value: number): void;
     finish_at(): number;
     use_percentage(value: boolean): void;
